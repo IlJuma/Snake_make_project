@@ -1,7 +1,19 @@
 pairs:
-  2UUY:
-    receptor: data/raw/2UUY_rec.pdb
-    ligand: data/raw/2UUY_lig.pdb
+  # 2UUY:                        # LightDock tutorial example, kept for testing
+  #   receptor: data/raw/2UUY_rec.pdb
+  #   ligand: data/raw/2UUY_lig.pdb
+  1efn:
+    receptor: data/raw/1efn_u2.pdb
+    ligand: data/raw/1efn_u1.pdb
+  2g45:
+    receptor: data/raw/2g45_u1.pdb
+    ligand: data/raw/2g45_u2.pdb
+  2goo:
+    receptor: data/raw/2goo_u1.pdb
+    ligand: data/raw/2goo_u2.pdb
+  3fap:
+    receptor: data/raw/3fap_u1.pdb
+    ligand: data/raw/3fap_u2.pdb
 
 docking:
   swarms: 5
