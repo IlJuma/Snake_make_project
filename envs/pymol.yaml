@@ -1,0 +1,6 @@
+channels:
+  - conda-forge
+dependencies:
+  - pymol-open-source
+  - pandas
+  - matplotlib

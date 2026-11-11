@@ -1,0 +1,10 @@
+pairs:
+  2UUY:
+    receptor: data/raw/2UUY_rec.pdb
+    ligand: data/raw/2UUY_lig.pdb
+
+docking:
+  swarms: 5
+  glowworms: 50
+  steps: 10
+  top_models: 5
