@@ -19,6 +19,8 @@ TOP = config["docking"]["top_models"]
 rule all:
     input:
         expand("results/{pair}/docking/top_{n}.pdb", pair=PAIRS, n=range(1, TOP + 1)),
+        #same poses but with receptor and ligand as two chains (ready for viewers/RMSD)
+        expand("results/{pair}/complex/top_{n}.pdb", pair=PAIRS, n=range(1, TOP + 1)),
         expand("results/{pair}/analysis/scores.csv", pair=PAIRS),
         expand("results/{pair}/analysis/top_scores.png", pair=PAIRS),
         expand("results/{pair}/analysis/top_1.png", pair=PAIRS)
@@ -197,6 +199,26 @@ rule top_models:
         "(cd {params.outdir} && lgd_top.py receptor.pdb ligand.pdb "
         "rank_by_scoring.list {params.top}) > {log} 2>&1"
 
+rule split_chains:
+# lgd_top.py writes receptor and ligand as one single chain A, so viewers like
+# ChimeraX or PyMOL load the pose as one molecule. This rule writes the same pose
+# with the receptor as chain R and the ligand as chain L (separated by TER), which
+# is what downstream steps (visualisation, RMSD, interface analysis) need.
+    input:
+        model="results/{pair}/docking/top_{n}.pdb",
+        #the receptor structure LightDock really used, defines where the ligand starts
+        receptor="results/{pair}/docking/lightdock_receptor.pdb"
+    output:
+        "results/{pair}/complex/top_{n}.pdb"
+    log:
+        "logs/{pair}/split_chains_top_{n}.log"
+    benchmark:
+        "benchmarks/{pair}/split_chains_top_{n}.tsv"
+    conda:
+        "envs/pymol.yaml"
+    script:
+        "scripts/split_chains.py"
+
 rule parse_results:
 # Parse the LightDock ranking (rank_by_scoring.list) of each pair:
 # - save all ranked poses with rank, swarm, glowworm, model file and score as a CSV table
@@ -219,15 +241,13 @@ rule parse_results:
 
 rule visualize:
 # Render an image of the best docked pose (top_1.pdb) of each pair with PyMOL:
-# - relabel receptor and ligand as separate chains (LightDock writes both as chain A)
 # - show both proteins as cartoon (receptor blue, ligand orange)
 # - show the interface residues (within 4 Å of the other protein) as sticks
     input:
-        model="results/{pair}/docking/top_1.pdb"
+        #two-chain version written by rule split_chains
+        model="results/{pair}/complex/top_1.pdb"
     output:
         "results/{pair}/analysis/top_1.png"
-    params:
-        receptor="results/{pair}/docking/lightdock_receptor.pdb"
     log:
         "logs/{pair}/visualize.log"
     benchmark:

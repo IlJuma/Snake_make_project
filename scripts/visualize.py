@@ -5,26 +5,12 @@ from pymol import cmd
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 model_file = snakemake.input.model
-receptor_file = snakemake.params.receptor
 png_file = snakemake.output[0]
 pair = snakemake.wildcards.pair
 
-# --- Label receptor and ligand as separate chains ---
-# LightDock writes both proteins as chain A, with overlapping residue numbers.
-# The receptor comes first in the file, so we count its atoms
-# and rename the chains: R = receptor, L = ligand.
-n_receptor = sum(1 for line in open(receptor_file) if line.startswith(("ATOM", "HETATM")))
-
-lines = []
-atom_count = 0
-for line in open(model_file):
-    if line.startswith(("ATOM", "HETATM")):
-        atom_count += 1
-        chain = "R" if atom_count <= n_receptor else "L"
-        line = line[:21] + chain + line[22:]          # column 22 = chain ID
-    lines.append(line)
-
-cmd.read_pdbstr("".join(lines), "complex")
+# The pose already has the receptor as chain R and the ligand as chain L
+# (written by rule split_chains).
+cmd.load(model_file, "complex")
 
 # --- Style ---
 cmd.dss("complex")                                  # calculate helices and sheets
