@@ -3,7 +3,7 @@ channels:
 dependencies:
   - python=3.11
   - pip
-  - gcc=13
-  - gxx=13
+  - c-compiler      # gcc on Linux, clang on macOS
+  - cxx-compiler
   - pip:
       - lightdock
