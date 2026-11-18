@@ -24,17 +24,10 @@ pair = snakemake.wildcards.pair
 
 # --- Label receptor and ligand as separate chains ---
 # LightDock writes both proteins as chain A, with overlapping residue numbers.
-# Problem is PyMol would merge residues from both proteins when they are overlapping 
-# --> which is not correct
-# The receptor comes first in the file, so it count its atoms
-# and rename the chains: R = receptor, L = ligand. 
-# to be able to seperate both for creating the picture
-
-
-#counts the atoms in the pdb file from the receptor from the receptor
+# The receptor comes first in the file, so we count its atoms
+# and rename the chains: R = receptor, L = ligand.
 n_receptor = sum(1 for line in open(receptor_file) if line.startswith(("ATOM", "HETATM")))
 
-#Renames the chain from the first n-atoms which belong to the receptor and the rest is Ligand
 lines = []
 atom_count = 0
 for line in open(model_file):
@@ -45,9 +38,6 @@ for line in open(model_file):
     lines.append(line)
 
 cmd.read_pdbstr("".join(lines), "complex")
-# The pose already has the receptor as chain R and the ligand as chain L
-# (written by rule split_chains).
-cmd.load(model_file, "complex")
 
 # --- Style ---
 cmd.dss("complex")                                  # calculate helices and sheets
