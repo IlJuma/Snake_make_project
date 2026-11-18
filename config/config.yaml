@@ -5,18 +5,18 @@ pairs:
   1efn:
     receptor: data/raw/1efn_u2.pdb
     ligand: data/raw/1efn_u1.pdb
-  2g45:
-    receptor: data/raw/2g45_u1.pdb
-    ligand: data/raw/2g45_u2.pdb
-  2goo:
-    receptor: data/raw/2goo_u1.pdb
-    ligand: data/raw/2goo_u2.pdb
-  3fap:
-    receptor: data/raw/3fap_u1.pdb
-    ligand: data/raw/3fap_u2.pdb
+  #2g45:
+    #receptor: data/raw/2g45_u1.pdb
+    #ligand: data/raw/2g45_u2.pdb
+  #2goo:
+    #receptor: data/raw/2goo_u1.pdb
+    #ligand: data/raw/2goo_u2.pdb
+  #3fap:
+    #receptor: data/raw/3fap_u1.pdb
+    #ligand: data/raw/3fap_u2.pdb
 
 docking:
-  swarms: 5
-  glowworms: 50
-  steps: 10
+  swarms: 20
+  glowworms: 100
+  steps: 100
   top_models: 5

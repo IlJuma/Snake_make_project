@@ -99,7 +99,7 @@ rule lightdock_run:
         steps=STEPS,
         outdir="results/{pair}/docking"
     #this says it can use up to 4 cores
-    threads: 4
+    threads: 16
     log:
         "logs/{pair}/lightdock_run.log"
     benchmark:
