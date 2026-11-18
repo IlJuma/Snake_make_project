@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - biopython
+  - numpy
+  - pandas
+  - matplotlib
+  - pytest

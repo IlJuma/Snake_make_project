@@ -14,14 +14,23 @@ STEPS = config["docking"]["steps"]
 GLOWWORMS = config["docking"]["glowworms"]
 TOP = config["docking"]["top_models"]
 
+#only the pairs that have a native (experimental) complex in the config can be compared by RMSD
+RMSD_PAIRS = [p for p in PAIRS if "native" in config["pairs"][p]]
+
 #Is the target rule -> with only input, at the end of the workflow these files need to exist
 #with expand the wildcards are inserted and creating a file/path for each value in the wildcard
 rule all:
     input:
         expand("results/{pair}/docking/top_{n}.pdb", pair=PAIRS, n=range(1, TOP + 1)),
+        #same poses but with receptor and ligand as two chains (ready for viewers/RMSD)
+        expand("results/{pair}/complex/top_{n}.pdb", pair=PAIRS, n=range(1, TOP + 1)),
         expand("results/{pair}/analysis/scores.csv", pair=PAIRS),
         expand("results/{pair}/analysis/top_scores.png", pair=PAIRS),
-        expand("results/{pair}/analysis/top_1.png", pair=PAIRS)
+        expand("results/{pair}/analysis/top_1.png", pair=PAIRS),
+        #comparison of the poses with the native complex (only pairs with a native)
+        expand("results/{pair}/analysis/rmsd.csv", pair=RMSD_PAIRS),
+        expand("results/{pair}/analysis/rmsd.png", pair=RMSD_PAIRS),
+        "results/rmsd_summary.csv" if RMSD_PAIRS else []
 
 #Rule which is responsible for the preprocessing the protein structures: removes water and non
 #non-protein molecules, add missing residues, add missing heavy atoms and add hydrogens to match pH7
@@ -197,6 +206,26 @@ rule top_models:
         "(cd {params.outdir} && lgd_top.py receptor.pdb ligand.pdb "
         "rank_by_scoring.list {params.top}) > {log} 2>&1"
 
+rule split_chains:
+# lgd_top.py writes receptor and ligand as one single chain A, so viewers like
+# ChimeraX or PyMOL load the pose as one molecule. This rule writes the same pose
+# with the receptor as chain R and the ligand as chain L (separated by TER), which
+# is what downstream steps (visualisation, RMSD, interface analysis) need.
+    input:
+        model="results/{pair}/docking/top_{n}.pdb",
+        #the receptor structure LightDock really used, defines where the ligand starts
+        receptor="results/{pair}/docking/lightdock_receptor.pdb"
+    output:
+        "results/{pair}/complex/top_{n}.pdb"
+    log:
+        "logs/{pair}/split_chains_top_{n}.log"
+    benchmark:
+        "benchmarks/{pair}/split_chains_top_{n}.tsv"
+    conda:
+        "envs/pymol.yaml"
+    script:
+        "scripts/split_chains.py"
+
 rule parse_results:
 # Parse the LightDock ranking (rank_by_scoring.list) of each pair:
 # - save all ranked poses with rank, swarm, glowworm, model file and score as a CSV table
@@ -219,15 +248,13 @@ rule parse_results:
 
 rule visualize:
 # Render an image of the best docked pose (top_1.pdb) of each pair with PyMOL:
-# - relabel receptor and ligand as separate chains (LightDock writes both as chain A)
 # - show both proteins as cartoon (receptor blue, ligand orange)
 # - show the interface residues (within 4 Å of the other protein) as sticks
     input:
-        model="results/{pair}/docking/top_1.pdb"
+        #two-chain version written by rule split_chains
+        model="results/{pair}/complex/top_1.pdb"
     output:
         "results/{pair}/analysis/top_1.png"
-    params:
-        receptor="results/{pair}/docking/lightdock_receptor.pdb"
     log:
         "logs/{pair}/visualize.log"
     benchmark:
@@ -236,3 +263,49 @@ rule visualize:
         "envs/pymol.yaml"
     script:
         "scripts/visualize.py"
+
+rule rmsd:
+# Check if the docking found the real binding mode: compare each of the top N poses with the
+# experimental complex (native) from the RCSB with the standard CAPRI metrics:
+# - L-RMSD: superpose the receptors, then how far is the ligand from the native ligand
+# - I-RMSD: RMSD of the interface residues only
+# - fnat: fraction of the native residue-residue contacts that the pose reproduces
+# - DockQ (0 = wrong, 1 = perfect) and the CAPRI class (incorrect/acceptable/medium/high)
+# Residues are paired by sequence alignment, because the numbering of the unbound inputs
+# differs from the native structure.
+    input:
+        #two-chain poses (receptor R, ligand L) in rank order, written by rule split_chains
+        models=expand("results/{{pair}}/complex/top_{n}.pdb", n=range(1, TOP + 1)),
+        #the LightDock score of each pose, to plot it against the RMSD
+        scores="results/{pair}/analysis/scores.csv",
+        native=lambda wc: config["pairs"][wc.pair]["native"]["pdb"]
+    output:
+        csv="results/{pair}/analysis/rmsd.csv",
+        plot="results/{pair}/analysis/rmsd.png"
+    params:
+        #native file and the chain IDs of receptor and ligand in it
+        native=lambda wc: config["pairs"][wc.pair]["native"]
+    log:
+        "logs/{pair}/rmsd.log"
+    benchmark:
+        "benchmarks/{pair}/rmsd.tsv"
+    conda:
+        "envs/rmsd.yaml"
+    script:
+        "scripts/rmsd.py"
+
+rule rmsd_summary:
+# One overview table for all pairs: quality of the top-ranked pose, of the best pose among the
+# top N and how many poses are at least CAPRI 'acceptable'.
+    input:
+        expand("results/{pair}/analysis/rmsd.csv", pair=RMSD_PAIRS)
+    output:
+        "results/rmsd_summary.csv"
+    params:
+        pairs=RMSD_PAIRS
+    log:
+        "logs/rmsd_summary.log"
+    conda:
+        "envs/rmsd.yaml"
+    script:
+        "scripts/rmsd_summary.py"

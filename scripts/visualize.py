@@ -19,7 +19,6 @@ sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 #Get the paths from the snakemake file to the needed files
 model_file = snakemake.input.model
-receptor_file = snakemake.params.receptor
 png_file = snakemake.output[0]
 pair = snakemake.wildcards.pair
 
@@ -46,6 +45,9 @@ for line in open(model_file):
     lines.append(line)
 
 cmd.read_pdbstr("".join(lines), "complex")
+# The pose already has the receptor as chain R and the ligand as chain L
+# (written by rule split_chains).
+cmd.load(model_file, "complex")
 
 # --- Style ---
 cmd.dss("complex")                                  # calculate helices and sheets
