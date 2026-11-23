@@ -214,6 +214,7 @@ rule split_chains:
     input:
         model="results/{pair}/docking/top_{n}.pdb",
         #the receptor structure LightDock really used, defines where the ligand starts
+    params:
         receptor="results/{pair}/docking/lightdock_receptor.pdb"
     output:
         "results/{pair}/complex/top_{n}.pdb"

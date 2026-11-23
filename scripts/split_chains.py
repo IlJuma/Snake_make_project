@@ -13,7 +13,7 @@ import sys
 sys.stderr = sys.stdout = open(snakemake.log[0], "w")
 
 model_file = snakemake.input.model
-receptor_file = snakemake.input.receptor
+receptor_file = snakemake.params.receptor
 out_file = snakemake.output[0]
 
 ATOM_RECORDS = ("ATOM", "HETATM")

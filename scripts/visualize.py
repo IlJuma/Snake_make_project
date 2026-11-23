@@ -22,6 +22,7 @@ model_file = snakemake.input.model
 png_file = snakemake.output[0]
 pair = snakemake.wildcards.pair
 
+'''
 # --- Label receptor and ligand as separate chains ---
 # LightDock writes both proteins as chain A, with overlapping residue numbers.
 # The receptor comes first in the file, so we count its atoms
@@ -38,6 +39,9 @@ for line in open(model_file):
     lines.append(line)
 
 cmd.read_pdbstr("".join(lines), "complex")
+'''
+# The model already has receptor (chain R) and ligand (chain L), written by rule split_chains
+cmd.load(model_file, "complex")
 
 # --- Style ---
 cmd.dss("complex")                                  # calculate helices and sheets

@@ -1,0 +1,9 @@
+pair    bb-fit rec  bb-fit lig   L-RMSD   I-RMSD   fnat   DockQ  CAPRI
+----------------------------------------------------------------------------
+1efn       0.66 A      0.66 A     0.66     0.78    0.85    0.878  high
+2g45      17.57 A      0.66 A     0.66     7.51    0.00    0.344  incorrect
+2goo       1.08 A      1.40 A     1.40     1.29    0.70    0.749  medium
+3fap       0.63 A      0.70 A     0.69     0.58    0.54    0.801  high
+
+bb-fit = backbone RMSD of the unbound chain fitted onto its native chain
+         (this is the unbound->bound conformational change, our hard floor)

@@ -1,0 +1,5 @@
+pair,complex,conf. change rec (A),conf. change lig (A),CEILING class,CEILING DockQ,poses,acceptable found,best DockQ found,best L-RMSD (A),rank of best pose,in top 5?,top5 best L-RMSD (A),top5 score spread,"r(score, L-RMSD)"
+1efn,HIV-1 Nef / Fyn SH3,0.66,0.66,high,0.878,874,1,0.256,6.67,38,no,31.01,4.15,0.088
+2g45,USP5 ZnF / ubiquitin,17.57,0.66,incorrect,0.344,793,0,0.208,10.01,344,no,26.2,2.99,0.076
+2goo,BMP-2 / ActRII,1.08,1.4,medium,0.749,1056,2,0.282,8.65,1030,no,35.13,0.67,0.047
+3fap,FKBP12 / FRB,0.63,0.7,high,0.801,987,2,0.308,9.9,99,no,19.61,3.1,0.11

@@ -1,26 +1,43 @@
 pairs:
-  # 2UUY:                        # LightDock tutorial example, kept for testing
-  #   receptor: data/raw/2UUY_rec.pdb
-  #   ligand: data/raw/2UUY_lig.pdb
+
   #
   # native = experimental complex from RCSB, used as reference for the RMSD.
   # receptor_chain / ligand_chain = the chains in that file that match our
   # receptor and ligand (and touch each other). Pairs without native get no RMSD.
+
   1efn:
     receptor: data/raw/1efn_u2.pdb
     ligand: data/raw/1efn_u1.pdb
+    native:
+      pdb: data/raw/1efn_native.pdb
+      receptor_chain: B
+      ligand_chain: A
+  
   2g45:
     receptor: data/raw/2g45_u1.pdb
     ligand: data/raw/2g45_u2.pdb
+    native:
+      pdb: data/raw/2g45_native.pdb
+      receptor_chain: A          # USP5 zinc finger
+      ligand_chain: B            # ubiquitin
   2goo:
     receptor: data/raw/2goo_u1.pdb
     ligand: data/raw/2goo_u2.pdb
+    native:
+      pdb: data/raw/2goo_native.pdb
+      receptor_chain: A          # BMP-2
+      ligand_chain: C            # ActRII
   3fap:
     receptor: data/raw/3fap_u1.pdb
     ligand: data/raw/3fap_u2.pdb
+    native:
+      pdb: data/raw/3fap_native.pdb
+      receptor_chain: A          # FKBP12
+      ligand_chain: B            # FRB (binding is mediated by rapamycin)
+
 
 docking:
-  swarms: 20
+  swarms: 5
   glowworms: 100
-  steps: 100
+  steps: 10
   top_models: 5
