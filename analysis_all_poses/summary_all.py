@@ -1,4 +1,4 @@
-"""Master summary: ceiling vs achieved, for all four pairs.
+"""Master summary: ceiling vs achieved, for the reported pairs (2g45 excluded).
 
 Combines
   - positive_control_results.txt : the best result achievable with these inputs
@@ -13,7 +13,6 @@ s100 = base / "s100"
 ctrl_file = base / "positive_control_results.txt"
 
 NAMES = {"1efn": "HIV-1 Nef / Fyn SH3",
-         "2g45": "USP5 ZnF / ubiquitin",
          "2goo": "BMP-2 / ActRII",
          "3fap": "FKBP12 / FRB"}
 
